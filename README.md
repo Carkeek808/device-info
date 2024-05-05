@@ -1,6 +1,6 @@
 # DeviceInfo
 
-#### Library size is : 31Kb
+#### Library size is : 42.8Kb
 
 Android library to get device information in a super easy way.
 DeviceInfo library gives you details of Hardware & Software configurations of your Android device.
