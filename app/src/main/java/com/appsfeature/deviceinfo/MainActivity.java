@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void getDeviceInfo() {
         DeviceInfo.getInstance()
-                .setEnableApplicationInfo(false)
                 .setEnablePermissionRequiredInfo(true)
                 .setDebugMode(true)
                 .setPermission(Manifest.permission.ACCESS_FINE_LOCATION)
