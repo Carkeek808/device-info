@@ -43,7 +43,7 @@ public class DeviceInfoTask {
                     .setDisplayInfo(DeviceDisplay.get().getInfo(context))
                     .setCpuInfo(CPU.get().getInfo())
                     .setFeatureInfo(Feature.get().getInfo(context))
-                    .setDeviceConfigInfo(new DeviceConfig().getInfo(context))
+                    .setDeviceConfigInfo(DeviceConfig.get().getInfo(context))
                     .setDeviceMemoryInfo(DeviceMemory.get().getInfo(context));
 
             if (DeviceInfo.getInstance().isEnableSensorInfo) {

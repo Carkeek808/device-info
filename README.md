@@ -115,6 +115,8 @@ Device Info provides following information of your Android device which grouped 
 ## Android Device Information
 ```  
 UserDeviceInfo.get().getInfo(context)               : HashMap<String, String>
+UserDeviceInfo.get().getBuildSDKVersion()           : int
+UserDeviceInfo.get().getAndroidOSName()             : String
 UserDeviceInfo.get().getOSVersion()                 : String
 UserDeviceInfo.get().getBaseOSVersion()             : String
 UserDeviceInfo.get().getDisplayVersion()            : String
@@ -133,22 +135,22 @@ UserDeviceInfo.get().getHardware()                  : String
 UserDeviceInfo.get().getLanguage()                  : String
 UserDeviceInfo.get().getManufacturer()              : String
 UserDeviceInfo.get().getModel()                     : String
-UserDeviceInfo.get().getDeviceId()                  : String
+UserDeviceInfo.get().getDeviceId(context)           : String
 UserDeviceInfo.get().getPhoneNo(context)            : String
 UserDeviceInfo.get().getProduct()                   : String
 UserDeviceInfo.get().getRadioVer()                  : String
-UserDeviceInfo.get().getScreenDisplayID()           : String
+UserDeviceInfo.get().getScreenDisplayID(context)    : String
 UserDeviceInfo.get().getSerial(context)             : String
-UserDeviceInfo.get().getBuildVersionSDK()           : int
 UserDeviceInfo.get().getDeviceType(context)         : String
 UserDeviceInfo.get().getPhoneType(context)          : String
-UserDeviceInfo.get().getPhoneTypeModDetail(context) : String
+UserDeviceInfo.get().getPhoneTypeMod(context)       : int
 UserDeviceInfo.get().getBuildID()                   : String
 UserDeviceInfo.get().getBuildTime()                 : long
-UserDeviceInfo.get().getOrientationDetail()         : String
+UserDeviceInfo.get().getOrientation(context)        : int
 UserDeviceInfo.get().isDeviceRooted()               : boolean
-UserDeviceInfo.get().isDeveloperModeEnabled()       : boolean
-UserDeviceInfo.get().isWifiAdbEnabled()             : boolean   
+UserDeviceInfo.get().isDeveloperModeEnabled(context): boolean
+UserDeviceInfo.get().isWifiAdbEnabled(context)      : boolean   
+UserDeviceInfo.get().isRunningOnEmulator()          : boolean   
 ```
 ## Battery
 ```
@@ -180,6 +182,8 @@ CPU.get().getNumCores()                         : int
 ## Network (permission required)
 ```
 Network.get().getInfo(context)                  : HashMap<String, String>
+Network.get().getAllCellInfo(context)           : List<CellInfo>
+Network.get().loadCellTowerInfo(context)        : String
 Network.get().isWifiEnabledDetail(context)      : String
 Network.get().getMACAddress(context)            : String
 Network.get().getWifiBSSID(context)             : String
@@ -190,7 +194,6 @@ Network.get().getIPv6Address(context)           : String
 Network.get().getDataType(context)              : String
 Network.get().getWifiSSID(context)              : String
 Network.get().getWifiLinkSpeed(context)         : String
-Network.get().loadCellTowerInfo(context)        : String
 ```
 ## SIM (permission required)
 ```
@@ -245,6 +248,21 @@ Feature.get().getDeviceList(context)                : HashMap<String, UsbDevice>
 Feature.get().getConnectedDevicesList(context)      : String
 Feature.get().isNfcEnabled(context)                 : boolean
 Feature.get().checkMultiTouchSupport(context)       : boolean
+```
+## DeviceConfig
+```
+DeviceConfig.get().getInfo(context)                 : HashMap<String, String>    
+DeviceConfig.get().getCurrentDate()                 : String
+DeviceConfig.get().getDeviceRingerMode(context)     : String
+DeviceConfig.get().getFormattedDate()               : String
+DeviceConfig.get().getFormattedTime()               : String
+DeviceConfig.get().getFormattedUpTime()             : String
+DeviceConfig.get().hasSdCard()                      : String
+
+DeviceConfig.isDeveloperModeEnabled(context)        : boolean
+DeviceConfig.isWifiAdbEnabled(context)              : boolean   
+DeviceConfig.isDeviceRooted()                       : boolean
+DeviceConfig.isRunningOnEmulator()                  : boolean   
 ```
 
 ```json

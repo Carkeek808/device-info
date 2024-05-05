@@ -601,8 +601,7 @@ public class Network {
         }
         int lCurrentApiVersion = android.os.Build.VERSION.SDK_INT;
         try {
-            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            List<CellInfo> cellInfoList = tm.getAllCellInfo();
+            List<CellInfo> cellInfoList = getAllCellInfo(context);
             if (cellInfoList != null) {
                 for (final CellInfo info : cellInfoList) {
                     int cId = 0, lac = 0;
@@ -671,6 +670,12 @@ public class Network {
             return "Unknown type of cell signal!";
         }
         return networkInfo.toString();
+    }
+
+    @SuppressLint("MissingPermission")
+    public List<CellInfo> getAllCellInfo(Context context) {
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        return tm.getAllCellInfo();
     }
 
     public boolean isValid(int cId, int lac) {

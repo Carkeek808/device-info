@@ -91,7 +91,7 @@ public class Feature {
 
     }
 
-    private HashMap<String, UsbDevice> getDeviceList(Context context) {
+    public HashMap<String, UsbDevice> getDeviceList(Context context) {
         UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         return manager.getDeviceList();
     }

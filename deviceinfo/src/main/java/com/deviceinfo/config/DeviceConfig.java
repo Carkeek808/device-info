@@ -9,11 +9,13 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.provider.Settings;
 
 import com.deviceinfo.util.DILogger;
 import com.deviceinfo.util.DITimeLogger;
 import com.deviceinfo.util.DIUtility;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -22,10 +24,21 @@ import java.util.HashMap;
 
 public class DeviceConfig {
 
+    private static volatile DeviceConfig instance;
+
     /**
      * Instantiates a new Easy config mod.
      */
-    public DeviceConfig() {
+    public static DeviceConfig get() {
+        if (instance == null) {
+            synchronized (DeviceConfig.class) {
+                if (instance == null) instance = new DeviceConfig();
+            }
+        }
+        return instance;
+    }
+
+    private DeviceConfig() {
     }
 
     public HashMap<String, String> getInfo(Context context) {
@@ -38,7 +51,10 @@ public class DeviceConfig {
             info.put("formatted_time", getFormattedTime());
             info.put("formatted_up_time", getFormattedUpTime());
             info.put("sd_card_available", hasSdCard());
-            info.put("running_on_emulator", isRunningOnEmulator());
+            info.put("is_running_on_emulator", String.valueOf(isRunningOnEmulator()));
+            info.put("is_device_rooted", String.valueOf(isDeviceRooted()));
+            info.put("is_developer_mode_enabled", String.valueOf(isDeveloperModeEnabled(context)));
+            info.put("is_wifi_adb_enabled", String.valueOf(isWifiAdbEnabled(context)));
         } catch (Exception e) {
             DILogger.e(e.toString());
             info.put("exception", e.toString());
@@ -137,7 +153,7 @@ public class DeviceConfig {
     /**
      * Is running on emulator boolean.
      */
-    public final String isRunningOnEmulator() {
+    public static boolean isRunningOnEmulator() {
         final boolean isGenyMotion = Build.MANUFACTURER.contains("Genymotion")
                 || Build.PRODUCT.contains("vbox86p")
                 || Build.DEVICE.contains("vbox86p")
@@ -147,11 +163,35 @@ public class DeviceConfig {
                 || Build.PRODUCT.contains("sdk")
                 || Build.HARDWARE.contains("goldfish");
 
-        if(isGenericEmulator || isGenyMotion){
-            return DIUtility.YES;
-        }else {
-            return DIUtility.NO;
+        return isGenericEmulator || isGenyMotion;
+    }
+
+    public static boolean isDeviceRooted() {
+        final String su = "su";
+        final String[] locations = {
+                "/sbin/", "/system/bin/", "/system/xbin/", "/system/sd/xbin/", "/system/bin/failsafe/",
+                "/data/local/xbin/", "/data/local/bin/", "/data/local/"
+        };
+        for (final String location : locations) {
+            if (new File(location + su).exists()) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    /**
+     * Is Developer Mode enabled
+     *
+     * @return the boolean
+     */
+    public static boolean isDeveloperModeEnabled(Context context) {
+        return Settings.Global.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) == 1;
+//        return Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 1;
+    }
+
+    public static boolean isWifiAdbEnabled(Context context) {
+        return Settings.Global.getInt(context.getContentResolver(), "adb_wifi_enabled", 0) != 0;
     }
 }
 

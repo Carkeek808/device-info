@@ -1,5 +1,11 @@
 package com.deviceinfo.device;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+import static android.telephony.TelephonyManager.PHONE_TYPE_CDMA;
+import static android.telephony.TelephonyManager.PHONE_TYPE_GSM;
+import static android.telephony.TelephonyManager.PHONE_TYPE_NONE;
+
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -9,29 +15,24 @@ import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.provider.Settings;
-import androidx.annotation.RequiresPermission;
-import androidx.core.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.deviceinfo.util.DIValidityCheck;
-import com.deviceinfo.util.EasyDeviceInfo;
+import androidx.annotation.RequiresPermission;
+import androidx.core.app.ActivityCompat;
+
+import com.deviceinfo.config.DeviceConfig;
 import com.deviceinfo.util.DILogger;
-import com.deviceinfo.util.PermissionUtility;
 import com.deviceinfo.util.DITimeLogger;
 import com.deviceinfo.util.DIUtility;
+import com.deviceinfo.util.DIValidityCheck;
+import com.deviceinfo.util.EasyDeviceInfo;
+import com.deviceinfo.util.PermissionUtility;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
-
-import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
-import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
-import static android.telephony.TelephonyManager.PHONE_TYPE_CDMA;
-import static android.telephony.TelephonyManager.PHONE_TYPE_GSM;
-import static android.telephony.TelephonyManager.PHONE_TYPE_NONE;
 
 /**
  * EasyDevice Mod Class
@@ -56,6 +57,8 @@ public class UserDeviceInfo {
         HashMap<String, String> info = new HashMap<>();
         try {
             info.put("android_os_version_name", getOSVersion());
+            info.put("build_version_sdk", String.valueOf(getBuildSDKVersion()));
+            info.put("android_os_name", getAndroidOSName());
             info.put("android_base_os_version_name", getBaseOSVersion());
             info.put("display_version", getDisplayVersion());
             info.put("build_board", getBoard());
@@ -79,7 +82,6 @@ public class UserDeviceInfo {
             info.put("radio_version", getRadioVer());
             info.put("screen_display_id", getScreenDisplayID(context));
             info.put("serial", getSerial(context));//required Permission
-            info.put("build_version_sdk", String.valueOf(getBuildVersionSDK()));
             info.put("device_type", getDeviceType(context));//required Activity
             info.put("phone_type", getPhoneType(context));
             info.put("phone_type_mod", getPhoneTypeModDetail(context));
@@ -205,7 +207,7 @@ public class UserDeviceInfo {
      *
      * @return the build version sdk
      */
-    public final int getBuildVersionSDK() {
+    public final int getBuildSDKVersion() {
         return VERSION.SDK_INT;
     }
 
@@ -357,7 +359,7 @@ public class UserDeviceInfo {
      *
      * @return the os codename
      */
-    public final String getAndroidOSVersion() {
+    public final String getAndroidOSName() {
         final String codename;
         switch (VERSION.SDK_INT) {
             case VERSION_CODES.BASE:
@@ -421,6 +423,25 @@ public class UserDeviceInfo {
                 break;
             case VERSION_CODES.P:
                 codename = "Pie";
+                break;
+            case VERSION_CODES.Q:
+                codename = "Android 10(Quince Tart)";
+                break;
+            case VERSION_CODES.R:
+                codename = "Android 11(Red Velvet)";
+                break;
+            case 31:
+            case 32:
+                codename = "Android 12(Snow Cone)";
+                break;
+            case 33:
+                codename = "Android 13(Tiramisu)";
+                break;
+            case 34:
+                codename = "Android 14(Upside Down Cake)";
+                break;
+            case 35:
+                codename = "Android 15(Vanilla Ice Cream)";
                 break;
             default:
                 codename = EasyDeviceInfo.NOT_FOUND_VAL;
@@ -650,18 +671,8 @@ public class UserDeviceInfo {
      *
      * @return the boolean
      */
-    public final boolean isDeviceRooted() {
-        final String su = "su";
-        final String[] locations = {
-                "/sbin/", "/system/bin/", "/system/xbin/", "/system/sd/xbin/", "/system/bin/failsafe/",
-                "/data/local/xbin/", "/data/local/bin/", "/data/local/"
-        };
-        for (final String location : locations) {
-            if (new File(location + su).exists()) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isDeviceRooted() {
+        return DeviceConfig.isDeviceRooted();
     }
 
     /**
@@ -669,12 +680,14 @@ public class UserDeviceInfo {
      *
      * @return the boolean
      */
-    public static boolean isDeveloperModeEnabled(Context context) {
-        return Settings.Global.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) == 1;
-//        return Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 1;
+    public boolean isDeveloperModeEnabled(Context context) {
+        return DeviceConfig.isDeveloperModeEnabled(context);
     }
 
-    public static boolean isWifiAdbEnabled(Context context) {
-        return Settings.Global.getInt(context.getContentResolver(), "adb_wifi_enabled", 0) != 0;
+    public boolean isWifiAdbEnabled(Context context) {
+        return DeviceConfig.isWifiAdbEnabled(context);
+    }
+    public boolean isRunningOnEmulator() {
+        return DeviceConfig.isRunningOnEmulator();
     }
 }
