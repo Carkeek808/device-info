@@ -27,11 +27,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         pbProgress = findViewById(R.id.pb_progress);
         tvStatus = findViewById(R.id.tvStatus);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         getDeviceInfo();
     }
 
     private void getDeviceInfo() {
         DeviceInfo.getInstance()
+                .setEnableApplicationInfo(false)
                 .setEnablePermissionRequiredInfo(true)
                 .setDebugMode(true)
                 .setPermission(Manifest.permission.ACCESS_FINE_LOCATION)

@@ -34,8 +34,15 @@ public class DeviceInfo {
     private DeviceInfo() {
     }
 
+    private static volatile DeviceInfo instance;
+
     public static DeviceInfo getInstance() {
-        return new DeviceInfo();
+        if (instance == null) {
+            synchronized (DeviceInfo.class) {
+                if (instance == null) instance = new DeviceInfo();
+            }
+        }
+        return instance;
     }
 
     /**
