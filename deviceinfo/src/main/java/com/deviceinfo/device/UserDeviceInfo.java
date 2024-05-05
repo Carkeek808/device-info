@@ -38,10 +38,17 @@ import static android.telephony.TelephonyManager.PHONE_TYPE_NONE;
  */
 public class UserDeviceInfo {
 
-    private final TelephonyManager tm;
+    private static volatile UserDeviceInfo instance;
 
-    public UserDeviceInfo(Context context) {
-        this.tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+    public static UserDeviceInfo get() {
+        if (instance == null) {
+            synchronized (UserDeviceInfo.class) {
+                if (instance == null) instance = new UserDeviceInfo();
+            }
+        }
+        return instance;
+    }
+    private UserDeviceInfo() {
     }
 
     public HashMap<String, String> getInfo(Context context) {
@@ -74,8 +81,8 @@ public class UserDeviceInfo {
             info.put("serial", getSerial(context));//required Permission
             info.put("build_version_sdk", String.valueOf(getBuildVersionSDK()));
             info.put("device_type", getDeviceType(context));//required Activity
-            info.put("phone_type", getPhoneType());
-            info.put("phone_type_mod", getPhoneTypeModDetail());
+            info.put("phone_type", getPhoneType(context));
+            info.put("phone_type_mod", getPhoneTypeModDetail(context));
             info.put("build_id", getBuildID());
             info.put("build_time", DIUtility.formattedDate(getBuildTime()));
             info.put("orientation", getOrientationDetail(context));
@@ -302,10 +309,11 @@ public class UserDeviceInfo {
     @Deprecated
     public final String getIMEI(Context context) {
         try {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
             String result = null;
             if (PermissionUtility.hasPermission(context, permission.READ_PHONE_STATE)) {
-                result = this.tm.getDeviceId();
+                result = tm.getDeviceId();
             }
 
             return DIValidityCheck.checkValidData(result);
@@ -483,12 +491,13 @@ public class UserDeviceInfo {
             return "Permission Missing (READ_PHONE_STATE)";
         }
         try {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             String result = null;
             if (ActivityCompat.checkSelfPermission(context, permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(context, permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                 return "Permission Missing (READ_PHONE_STATE | READ_PHONE_NUMBERS | READ_SMS)";
             }
-            result = this.tm.getLine1Number();
+            result = tm.getLine1Number();
 
             return DIValidityCheck.checkValidData(result);
         } catch (NullPointerException e) {
@@ -505,9 +514,10 @@ public class UserDeviceInfo {
      *
      * @return the phone type
      */
-    public final String getPhoneType() {
+    public final String getPhoneType(Context context) {
         try {
-            switch (this.tm.getPhoneType()) {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            switch (tm.getPhoneType()) {
                 case PHONE_TYPE_GSM:
                     return "GSM";
 
@@ -526,8 +536,8 @@ public class UserDeviceInfo {
         }
     }
 
-    public final String getPhoneTypeModDetail() {
-        switch (getPhoneTypeMod()) {
+    public final String getPhoneTypeModDetail(Context context) {
+        switch (getPhoneTypeMod(context)) {
             case PhoneType.CDMA:
                 return "CDMA";
             case PhoneType.GSM:
@@ -539,9 +549,10 @@ public class UserDeviceInfo {
     }
 
     @PhoneType
-    public final int getPhoneTypeMod() {
+    public final int getPhoneTypeMod(Context context) {
         try {
-            switch (this.tm.getPhoneType()) {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            switch (tm.getPhoneType()) {
                 case PHONE_TYPE_GSM:
                     return PhoneType.GSM;
 
@@ -651,5 +662,19 @@ public class UserDeviceInfo {
             }
         }
         return false;
+    }
+
+    /**
+     * Is Developer Mode enabled
+     *
+     * @return the boolean
+     */
+    public static boolean isDeveloperModeEnabled(Context context) {
+        return Settings.Global.getInt(context.getContentResolver(), Settings.Global.ADB_ENABLED, 0) == 1;
+//        return Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 1;
+    }
+
+    public static boolean isWifiAdbEnabled(Context context) {
+        return Settings.Global.getInt(context.getContentResolver(), "adb_wifi_enabled", 0) != 0;
     }
 }

@@ -19,10 +19,20 @@ import java.util.HashMap;
 
 public class DeviceDisplay {
 
-    private final Display display;
 
-    public DeviceDisplay(Context context) {
-        this.display = getDisplayObject(context);
+    private static volatile DeviceDisplay instance;
+
+    public static DeviceDisplay get() {
+        if (instance == null) {
+            synchronized (DeviceDisplay.class) {
+                if (instance == null) instance = new DeviceDisplay();
+            }
+        }
+        return instance;
+    }
+
+    private DeviceDisplay() {
+
     }
 
 
@@ -31,12 +41,12 @@ public class DeviceDisplay {
         HashMap<String, String> info = new HashMap<>();
         try {
             info.put("density", getDensity(context));
-            info.put("physical_size", getPhysicalSize());
+            info.put("physical_size", getPhysicalSize(context));
             info.put("orientation", getDeviceOrientation(context));
             info.put("layout_direction", String.valueOf(getLayoutDirection(context)));
-            info.put("resolution", getResolution());
+            info.put("resolution", getResolution(context));
             info.put("screen_round", String.valueOf(isScreenRound(context)));
-            info.put("refresh_rate", getRefreshRate());
+            info.put("refresh_rate", getRefreshRate(context));
         } catch (Exception e) {
             DILogger.e(e.toString());
             info.put("exception", e.toString());
@@ -133,12 +143,13 @@ public class DeviceDisplay {
         return context.getResources().getConfiguration().orientation;
     }
 
-    public final String getPhysicalSize() {
+    public final String getPhysicalSize(Context context) {
         float result = 0.0f;
         try {
+            Display display = getDisplayObject(context);
             final DisplayMetrics metrics = new DisplayMetrics();
             if (display != null) {
-                this.display.getMetrics(metrics);
+                display.getMetrics(metrics);
                 final float x = (float) StrictMath.pow(metrics.widthPixels / metrics.xdpi, 2);
                 final float y = (float) StrictMath.pow(metrics.heightPixels / metrics.ydpi, 2);
                 result = (float) Math.sqrt(x + y);
@@ -151,8 +162,9 @@ public class DeviceDisplay {
         return String.valueOf(result);
     }
 
-    public final String getRefreshRate() {
+    public final String getRefreshRate(Context context) {
         try {
+            Display display = getDisplayObject(context);
             return String.valueOf(display.getRefreshRate());
         } catch (NullPointerException e) {
             DILogger.e(DIUtility.ERROR_TAG, e.getMessage());
@@ -166,11 +178,12 @@ public class DeviceDisplay {
     /**
      * Gets resolution.
      */
-    public final String getResolution() {
+    public final String getResolution(Context context) {
         try {
+            Display display = getDisplayObject(context);
             final DisplayMetrics metrics = new DisplayMetrics();
             if (display != null) {
-                this.display.getMetrics(metrics);
+                display.getMetrics(metrics);
                 return DIValidityCheck.checkValidData(metrics.heightPixels + "x" + metrics.widthPixels);
             } else {
                 return DIValidityCheck.checkValidData("");

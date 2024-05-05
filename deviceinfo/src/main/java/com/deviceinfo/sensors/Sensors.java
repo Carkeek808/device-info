@@ -11,15 +11,23 @@ import java.util.List;
 
 public class Sensors {
 
-    private final SensorManager sensorManager;
+    private static volatile Sensors instance;
 
-    public Sensors(Context context) {
-        this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+    public static Sensors get() {
+        if (instance == null) {
+            synchronized (Sensors.class) {
+                if (instance == null) instance = new Sensors();
+            }
+        }
+        return instance;
     }
 
-    public List<Sensor> getInfo() {
+    private Sensors() {
+    }
+
+    public List<Sensor> getInfo(Context context) {
         long startTime = DITimeLogger.getStartTime();
-        List<Sensor> sensors = getAllSensors();
+        List<Sensor> sensors = getAllSensors(context);
         DITimeLogger.timeLogging("Sensors", startTime);
         return sensors;
     }
@@ -27,9 +35,10 @@ public class Sensors {
     /**
      * Gets all sensors.
      */
-    public List<Sensor> getAllSensors() {
+    public List<Sensor> getAllSensors(Context context) {
         try {
-            return this.sensorManager.getSensorList(Sensor.TYPE_ALL);
+            SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            return sensorManager.getSensorList(Sensor.TYPE_ALL);
         }catch (NullPointerException e){
             return new ArrayList<>();
         }catch (Exception e){

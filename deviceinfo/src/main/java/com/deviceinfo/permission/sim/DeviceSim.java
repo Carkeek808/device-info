@@ -31,19 +31,27 @@ import java.util.Locale;
  */
 public class DeviceSim {
 
-    private final TelephonyManager tm;
+    private static volatile DeviceSim instance;
 
-    public DeviceSim(Context context) {
-        this.tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+    public static DeviceSim get() {
+        if (instance == null) {
+            synchronized (DeviceSim.class) {
+                if (instance == null) instance = new DeviceSim();
+            }
+        }
+        return instance;
+    }
+
+    private DeviceSim() {
     }
 
     public HashMap<String, String> getInfo(Context context) {
         long startTime = DITimeLogger.getStartTime();
         HashMap<String, String> info = new HashMap<>();
         try {
-            info.put("carrier", getCarrier());
-            info.put("country", getCountry());
-            info.put("sim_network_locked", isSimNetworkLocked());
+            info.put("carrier", getCarrier(context));
+            info.put("country", getCountry(context));
+            info.put("sim_network_locked", isSimNetworkLocked(context));
             //Permission Required
 
             List<SubscriptionInfo> simInfo = getActiveMultiSimInfo(context);
@@ -128,11 +136,12 @@ public class DeviceSim {
      *
      * @return the carrier
      */
-    public final String getCarrier() {
+    public final String getCarrier(Context context) {
         try {
             String result = null;
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if ((tm != null) && (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA)) {
-                result = this.tm.getNetworkOperatorName().toLowerCase(Locale.getDefault());
+                result = tm.getNetworkOperatorName().toLowerCase(Locale.getDefault());
             }
             return DIValidityCheck.checkValidData(
                     DIValidityCheck.handleIllegalCharacterInResult(result));
@@ -146,11 +155,12 @@ public class DeviceSim {
      *
      * @return the country
      */
-    public final String getCountry() {
+    public final String getCountry(Context context) {
         try {
             final String result;
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if ((tm != null) && (tm.getSimState() == TelephonyManager.SIM_STATE_READY)) {
-                result = this.tm.getSimCountryIso().toLowerCase(Locale.getDefault());
+                result = tm.getSimCountryIso().toLowerCase(Locale.getDefault());
             } else {
                 final Locale locale = Locale.getDefault();
                 result = locale.getCountry().toLowerCase(locale);
@@ -178,9 +188,10 @@ public class DeviceSim {
             return "Permission Missing (READ_PHONE_STATE)";
         }
         try {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             String result = null;
             if ((tm != null) && PermissionUtility.hasPermission(context, permission.READ_PHONE_STATE)) {
-                result = this.tm.getSubscriberId();
+                result = tm.getSubscriberId();
             }
 
             return DIValidityCheck.checkValidData(result);
@@ -196,10 +207,11 @@ public class DeviceSim {
             return "Permission Missing (READ_PHONE_STATE)";
         }
         try {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             String result = null;
             if ((tm != null) && PermissionUtility.hasPermission(context, permission.READ_PHONE_STATE)) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    result = this.tm.getImei();
+                    result = tm.getImei();
                 }
             }
 
@@ -247,8 +259,9 @@ public class DeviceSim {
         }
         try {
             String result = null;
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if ((tm != null) && PermissionUtility.hasPermission(context, permission.READ_PHONE_STATE)) {
-                result = this.tm.getSimSerialNumber();
+                result = tm.getSimSerialNumber();
             }
             return DIValidityCheck.checkValidData(result);
         } catch (Exception e) {
@@ -275,8 +288,9 @@ public class DeviceSim {
      *
      * @return the boolean
      */
-    public final String isSimNetworkLocked() {
+    public final String isSimNetworkLocked(Context context) {
         try {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if ((tm != null) && (tm.getSimState() == TelephonyManager.SIM_STATE_NETWORK_LOCKED)) {
                 return DIUtility.YES;
             } else {

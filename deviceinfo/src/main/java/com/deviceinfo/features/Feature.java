@@ -17,17 +17,25 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class Feature {
-    private final DeviceNFC deviceNfc;
+    private static volatile Feature instance;
 
-    public Feature(Context context) {
-        deviceNfc = new DeviceNFC(context);
+    public static Feature get() {
+        if (instance == null) {
+            synchronized (Feature.class) {
+                if (instance == null) instance = new Feature();
+            }
+        }
+        return instance;
+    }
+
+    private Feature() {
     }
 
     public HashMap<String, String> getInfo(Context context) {
         long startTime = DITimeLogger.getStartTime();
         HashMap<String, String> info = new HashMap<>();
         try {
-            info.put("nfc", deviceNfc.nfcEnabled());
+            info.put("is_nfc_enabled", "" + isNfcEnabled(context));
             info.put("connected_devices_list", getConnectedDevicesList(context));
             info.put("multi_touch", checkMultiTouchSupport(context));
         } catch (Exception e) {
@@ -36,6 +44,10 @@ public class Feature {
         }
         DITimeLogger.timeLogging("Feature", startTime);
         return info;
+    }
+
+    public boolean isNfcEnabled(Context context) {
+        return DeviceNFC.isNfcEnabled(context);
     }
 
     public String checkMultiTouchSupport(Context context) {
@@ -50,9 +62,7 @@ public class Feature {
     public String getConnectedDevicesList(Context context) {
         try {
             JSONArray jsonArray = new JSONArray();
-            UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-
-            HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
+            HashMap<String, UsbDevice> deviceList = getDeviceList(context);
             for (UsbDevice device : deviceList.values()) {
                 try {
                     JSONObject object = new JSONObject();
@@ -79,6 +89,11 @@ public class Feature {
             return e.getMessage();
         }
 
+    }
+
+    private HashMap<String, UsbDevice> getDeviceList(Context context) {
+        UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+        return manager.getDeviceList();
     }
 
 

@@ -15,7 +15,18 @@ import java.util.HashMap;
 
 public class Battery {
 
-    public Battery() {
+    private static volatile Battery instance;
+
+    public static Battery get() {
+        if (instance == null) {
+            synchronized (Battery.class) {
+                if (instance == null) instance = new Battery();
+            }
+        }
+        return instance;
+    }
+
+    private Battery() {
     }
 
     public HashMap<String, String> getInfo(Context context) {

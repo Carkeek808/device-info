@@ -9,27 +9,21 @@ import android.nfc.NfcAdapter;
  */
 public class DeviceNFC {
 
-    private final NfcAdapter nfcAdapter;
-
-    public DeviceNFC(Context context) {
-        this.nfcAdapter = NfcAdapter.getDefaultAdapter(context);
-    }
-
     /**
      * Is nfc enabled boolean.
      *
      * @return the boolean
      */
-    public final String nfcEnabled() {
-        if(isNfcEnabled()){
+    public static String nfcEnabled(Context context) {
+        if(isNfcEnabled(context)){
             return "Available";
         }else {
             return "Not available";
         }
     }
 
-    public final boolean isNfcEnabled() {
-        return (nfcAdapter != null) && this.nfcAdapter.isEnabled();
+    public static boolean isNfcEnabled(Context context) {
+        return NfcAdapter.getDefaultAdapter(context).isEnabled();
     }
 
     /**
@@ -37,7 +31,7 @@ public class DeviceNFC {
      *
      * @return the boolean
      */
-    public final boolean isNfcPresent() {
-        return nfcAdapter != null;
+    public static boolean isNfcPresent(Context context) {
+        return NfcAdapter.getDefaultAdapter(context) != null;
     }
 }

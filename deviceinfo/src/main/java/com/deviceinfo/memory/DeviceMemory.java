@@ -27,11 +27,20 @@ import static android.os.Environment.getExternalStorageState;
  */
 public class DeviceMemory {
 
-    private static final String IO_EXCEPTION = "IO Exception";
+    private static volatile DeviceMemory instance;
+
+    public static DeviceMemory get() {
+        if (instance == null) {
+            synchronized (DeviceMemory.class) {
+                if (instance == null) instance = new DeviceMemory();
+            }
+        }
+        return instance;
+    }
 
     private static final int BYTEFACTOR = 1024;
 
-    public DeviceMemory() {
+    private DeviceMemory() {
     }
 
     public HashMap<String, String> getInfo(Context context) {

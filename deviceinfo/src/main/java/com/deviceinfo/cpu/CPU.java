@@ -21,10 +21,19 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class CPU {
+    private static volatile CPU instance;
 
-    public CPU() {
+    public static CPU get() {
+        if (instance == null) {
+            synchronized (CPU.class) {
+                if (instance == null) instance = new CPU();
+            }
+        }
+        return instance;
     }
 
+    private CPU() {
+    }
 
     public HashMap<String, String> getInfo() {
         long startTime = DITimeLogger.getStartTime();

@@ -114,108 +114,137 @@ Device Info provides following information of your Android device which grouped 
 
 ## Android Device Information
 ```  
-android os version name
-display version
-build board
-brand name
-host
-build tags
-build user
-version code name
-version incremental
-version release
-build device
-device unique fingerprint
-hardware
-language
-manufacturer
-device model
-product
-radio version
-screen display id
-build version sdk
-phone type
-build id
-build time
+UserDeviceInfo.get().getInfo(context)               : HashMap<String, String>
+UserDeviceInfo.get().getOSVersion()                 : String
+UserDeviceInfo.get().getBaseOSVersion()             : String
+UserDeviceInfo.get().getDisplayVersion()            : String
+UserDeviceInfo.get().getBoard()                     : String
+UserDeviceInfo.get().getBootloader()                : String
+UserDeviceInfo.get().getBuildBrand()                : String
+UserDeviceInfo.get().getBuildHost()                 : String
+UserDeviceInfo.get().getBuildTags()                 : String
+UserDeviceInfo.get().getBuildUser()                 : String
+UserDeviceInfo.get().getBuildVersionCodename()      : String
+UserDeviceInfo.get().getBuildVersionIncremental()   : String
+UserDeviceInfo.get().getBuildVersionRelease()       : String  
+UserDeviceInfo.get().getDevice()                    : String
+UserDeviceInfo.get().getFingerprint()               : String
+UserDeviceInfo.get().getHardware()                  : String
+UserDeviceInfo.get().getLanguage()                  : String
+UserDeviceInfo.get().getManufacturer()              : String
+UserDeviceInfo.get().getModel()                     : String
+UserDeviceInfo.get().getDeviceId()                  : String
+UserDeviceInfo.get().getPhoneNo(context)            : String
+UserDeviceInfo.get().getProduct()                   : String
+UserDeviceInfo.get().getRadioVer()                  : String
+UserDeviceInfo.get().getScreenDisplayID()           : String
+UserDeviceInfo.get().getSerial(context)             : String
+UserDeviceInfo.get().getBuildVersionSDK()           : int
+UserDeviceInfo.get().getDeviceType(context)         : String
+UserDeviceInfo.get().getPhoneType(context)          : String
+UserDeviceInfo.get().getPhoneTypeModDetail(context) : String
+UserDeviceInfo.get().getBuildID()                   : String
+UserDeviceInfo.get().getBuildTime()                 : long
+UserDeviceInfo.get().getOrientationDetail()         : String
+UserDeviceInfo.get().isDeviceRooted()               : boolean
+UserDeviceInfo.get().isDeveloperModeEnabled()       : boolean
+UserDeviceInfo.get().isWifiAdbEnabled()             : boolean   
 ```
 ## Battery
 ```
-technology
-temperature
-voltage
-charging state
-charging source
-charged percentage
-health
+Battery.get().getInfo(context)                      : HashMap<String, String>
+Battery.get().getBatteryTechnology(context)         : String
+Battery.get().getBatteryTemperature(context)        : float
+Battery.get().getBatteryVoltage(context)            : int
+Battery.get().getDeviceChargingState(context)       : String
+Battery.get().getChargingSource(context)            : String
+Battery.get().getChargingSourceIndexDetail(context) : String
+Battery.get().isBatteryPresent(context)             : boolean
+Battery.get().getBatteryPercentage(context)         : int
+Battery.get().getBatteryHealth(context)             : String
 ```
 ## Sensor
 ```
-(Accelerometer, Gyroscope, Pedometer, Magnetometer, Step detector, Gravity, Motion, Rotation, Tilt, Gesture, Wakeup)
-Available information regarding each sensor:
-Sensor Name
-Vendor
-Version
+Sensors.get().getAllSensors(context)            : List<Sensor>
 ```
 ## CPU
 ```
-supported 32
-supported 64
-supported ABIS
-supported ABIS details
-num of cores
-details
+CPU.get().getInfo()                             : HashMap<String, String>
+CPU.get().getCPUInfo()                          : HashMap<String, String>
+CPU.get().getStringSupported32bitABIS()         : String
+CPU.get().getStringSupported64bitABIS()         : String
+CPU.get().getStringSupportedABIS()              : String
+CPU.get().getSupportedABIS()                    : String[]
+CPU.get().getNumCores()                         : int 
 ```
-## Network
+## Network (permission required)
 ```
-wifi enabled
-bssid
-connection status
-ip v4 address
-ip v6 address
-data type
-ssid
-link speed
-cell tower
+Network.get().getInfo(context)                  : HashMap<String, String>
+Network.get().isWifiEnabledDetail(context)      : String
+Network.get().getMACAddress(context)            : String
+Network.get().getWifiBSSID(context)             : String
+Network.get().isNetworkAvailable(context)       : String
+Network.get().isInternetConnected(context)      : boolean
+Network.get().getIPv4Address(context)           : String
+Network.get().getIPv6Address(context)           : String
+Network.get().getDataType(context)              : String
+Network.get().getWifiSSID(context)              : String
+Network.get().getWifiLinkSpeed(context)         : String
+Network.get().loadCellTowerInfo(context)        : String
 ```
-## SIM
+## SIM (permission required)
 ```
-carrier
-country
-sim network locked
-IMEI
-IMSI
-number of active sim
-sim serial
-sim subscription
+DeviceSim.get().getInfo(context)                : HashMap<String, String> 
+DeviceSim.get().getActiveMultiSimInfo(context)  : List<SubscriptionInfo>
+DeviceSim.get().getCarrier(context)             : String
+DeviceSim.get().isSimNetworkLocked(context)     : String
+DeviceSim.get().getIMEI(context)                : String
+DeviceSim.get().getIMSI(context)                : String
+DeviceSim.get().getNumberOfActiveSim(context)   : String
+DeviceSim.get().getSIMSerial(context)           : String
+DeviceSim.get().getSIMSerial(context)           : String
 ```
 ## Storage
 ```
-total ram
-external memory available
-total internal memory size
-available internal memory size
-total external memory size
-available external memory size
+DeviceMemory.get().getInfo(context)                 : HashMap<String, String>
+DeviceMemory.get().getTotalInternalMemorySize()     : long 
+DeviceMemory.get().getAvailableInternalMemorySize() : long 
+DeviceMemory.get().getTotalRAM()                    : long 
+DeviceMemory.get().totalRamMemorySize()             : long 
+DeviceMemory.get().freeRamMemorySize()              : long 
+DeviceMemory.get().externalMemoryAvailable()        : String 
+DeviceMemory.get().getTotalExternalMemorySize()     : long 
+DeviceMemory.get().getAvailableExternalMemorySize() : long 
+DeviceMemory.get().convertToGbFormatted()           : String 
 ```
-## Bluetooth
+## Bluetooth (permission required)
 ```
-has bluetooth le
-has bluetooth le advertising
+Bluetooth.get().getInfo(context)                    : HashMap<String, String> 
+Bluetooth.get().hasBluetoothLe(context)             : Boolean
+Bluetooth.get().hasBluetoothLeDetail(context)       : String
+Bluetooth.get().hasBluetoothLeAdvertising(context)  : String
 ```
 ## Display
 ```
-density
-physical size
-orientation
-resolution
-screen round
-refresh rate
+DeviceDisplay.get().getInfo(context)                : HashMap<String, String> 
+DeviceDisplay.get().getDisplayObject(context)       : Display 
+DeviceDisplay.get().getDensity(context)             : String 
+DeviceDisplay.get().getPhysicalSize(context)        : String 
+DeviceDisplay.get().getOrientation(context)         : int 
+DeviceDisplay.get().getDeviceOrientation(context)   : String 
+DeviceDisplay.get().getLayoutDirection(context)     : int 
+DeviceDisplay.get().getResolution(context)          : String 
+DeviceDisplay.get().isScreenRound(context)          : boolean 
+DeviceDisplay.get().getRefreshRate(context)         : String 
+DeviceDisplay.get().getDisplayXYCoordinates(context) : int[] 
 ```
 ## Features
 ```
-nfc
-connected devices list
-multi touch
+Feature.get().getInfo(context)                      : HashMap<String, String>   
+Feature.get().getDeviceList(context)                : HashMap<String, UsbDevice>
+Feature.get().getConnectedDevicesList(context)      : String
+Feature.get().isNfcEnabled(context)                 : boolean
+Feature.get().checkMultiTouchSupport(context)       : boolean
 ```
 
 ```json
@@ -349,84 +378,6 @@ multi touch
     "ssid": "\"AKR WiFi.5G\""
   },
   "sensorsInfo": [
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 3
-    },
-    {
-      "mFlags": 2
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 6
-    },
-    {
-      "mFlags": 2
-    },
-    {
-      "mFlags": 5
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 7
-    },
-    {
-      "mFlags": 5
-    },
-    {
-      "mFlags": 2
-    },
-    {
-      "mFlags": 16
-    },
-    {
-      "mFlags": 0
-    },
-    {
-      "mFlags": 2
-    },
-    {
-      "mFlags": 2
-    },
-    {
-      "mFlags": 3
-    },
-    {
-      "mFlags": 3
-    },
-    {
-      "mFlags": 2
-    },
-    {
-      "mFlags": 2
-    },
     {
       "mFlags": 0
     }

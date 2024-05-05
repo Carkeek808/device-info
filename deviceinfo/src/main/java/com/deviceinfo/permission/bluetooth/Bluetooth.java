@@ -17,12 +17,22 @@ import java.util.HashMap;
  * EasyBluetooth Mod Class
  */
 public class Bluetooth {
- 
+
+    private static volatile Bluetooth instance;
+
     /**
      * Instantiates a new Easy bluetooth mod.
      */
+    public static Bluetooth get() {
+        if (instance == null) {
+            synchronized (Bluetooth.class) {
+                if (instance == null) instance = new Bluetooth();
+            }
+        }
+        return instance;
+    }
 
-    public Bluetooth() {
+    private Bluetooth() {
     }
 
     public HashMap<String, String> getInfo(Context context) {

@@ -38,16 +38,16 @@ public class DeviceInfoTask {
         try {
             //permission not required
             DeviceInfoResult jsonResponse = new DeviceInfoResult()
-                    .setDeviceInfo(new UserDeviceInfo(context).getInfo(context))
-                    .setBatteryInfo(new Battery().getInfo(context))
-                    .setDisplayInfo(new DeviceDisplay(context).getInfo(context))
-                    .setCpuInfo(new CPU().getInfo())
-                    .setFeatureInfo(new Feature(context).getInfo(context))
+                    .setDeviceInfo(UserDeviceInfo.get().getInfo(context))
+                    .setBatteryInfo(Battery.get().getInfo(context))
+                    .setDisplayInfo(DeviceDisplay.get().getInfo(context))
+                    .setCpuInfo(CPU.get().getInfo())
+                    .setFeatureInfo(Feature.get().getInfo(context))
                     .setDeviceConfigInfo(new DeviceConfig().getInfo(context))
-                    .setDeviceMemoryInfo(new DeviceMemory().getInfo(context));
+                    .setDeviceMemoryInfo(DeviceMemory.get().getInfo(context));
 
             if (DeviceInfo.getInstance().isEnableSensorInfo) {
-                jsonResponse.setSensorsInfo(new Sensors(context).getInfo());
+                jsonResponse.setSensorsInfo(Sensors.get().getInfo(context));
             }
             if (DeviceInfo.getInstance().isEnableApplicationInfo) {
                 jsonResponse.setApplicationInfo(new Application().getInfo(context));
@@ -56,13 +56,13 @@ public class DeviceInfoTask {
             //permission required
             if(DeviceInfo.getInstance().isEnablePermissionRequiredInfo) {
                 if (DeviceInfo.getInstance().isEnableBluetoothInfo) {
-                    jsonResponse.setBluetoothInfo(new Bluetooth().getInfo(context));
+                    jsonResponse.setBluetoothInfo(Bluetooth.get().getInfo(context));
                 }
                 if (DeviceInfo.getInstance().isEnableNetworkInfo) {
-                    jsonResponse.setNetworkInfo(new Network(context).getInfo(context));
+                    jsonResponse.setNetworkInfo(Network.get().getInfo(context));
                 }
                 if (DeviceInfo.getInstance().isEnableSIMInfo) {
-                    jsonResponse.setDeviceSimInfo(new DeviceSim(context).getInfo(context));
+                    jsonResponse.setDeviceSimInfo(DeviceSim.get().getInfo(context));
                 }
             }
 

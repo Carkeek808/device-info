@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -51,11 +52,18 @@ import java.util.Locale;
 public class Network {
 
     private static final String SOCKET_EXCEPTION = "Socket Exception";
+    private static volatile Network instance;
 
-    private final TelephonyManager tm;
+    public static Network get() {
+        if (instance == null) {
+            synchronized (Network.class) {
+                if (instance == null) instance = new Network();
+            }
+        }
+        return instance;
+    }
 
-    public Network(Context context) {
-        this.tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+    private Network() {
     }
 
     public HashMap<String, String> getInfo(Context context) {
@@ -68,6 +76,7 @@ public class Network {
             info.put("mac_address", getMACAddress(context, "wlan0"));
             info.put("bssid", getWifiBSSID(context));
             info.put("connection_status", isNetworkAvailable(context));
+            info.put("is_internet_connected", "" + isInternetConnected(context));
             info.put("ip_v4_address", getIPv4Address(context));
             info.put("ip_v6_address", getIPv6Address(context));
             info.put("data_type", getDataType(context));
@@ -507,6 +516,27 @@ public class Network {
         }
         return DIValidityCheck.checkValidData(result);
     }
+    public static boolean isInternetConnected(Context context) {
+        boolean isConnected = false;
+        try {
+            if (context != null && context.getSystemService(Context.CONNECTIVITY_SERVICE) != null && context.getSystemService(Context.CONNECTIVITY_SERVICE) instanceof ConnectivityManager) {
+                ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    android.net.Network network = connectivityManager.getActiveNetwork();
+                    if (network != null) {
+                        NetworkCapabilities nc = connectivityManager.getNetworkCapabilities(network);
+                        isConnected = nc != null && (nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || nc.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || nc.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || nc.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
+                    }
+                } else {
+                    NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                    isConnected = activeNetwork != null && activeNetwork.isConnected();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return isConnected;
+    }
 
     @RequiresPermission(allOf = {
             permission.ACCESS_NETWORK_STATE, permission.INTERNET
@@ -571,6 +601,7 @@ public class Network {
         }
         int lCurrentApiVersion = android.os.Build.VERSION.SDK_INT;
         try {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             List<CellInfo> cellInfoList = tm.getAllCellInfo();
             if (cellInfoList != null) {
                 for (final CellInfo info : cellInfoList) {
